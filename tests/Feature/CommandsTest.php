@@ -642,7 +642,8 @@ it('laradocs:lang scaffolds a locale file from the bundled English source', func
 
     $target = $dir . '/vendor/laradocs/fr/laradocs.php';
     expect(File::exists($target))->toBeTrue();
-    $strings = require $target;
+    /** @var array<string, mixed> $strings */
+    $strings = File::getRequire($target);
     expect($strings)->toBeArray()->toHaveKey('nav');
 });
 
@@ -673,7 +674,8 @@ it('laradocs:lang prefers the published English file over the bundled one', func
         ->expectsConfirmation($confirmTranslate, 'no')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings['nav']['home'])->toBe('Startseite');
 });
 
@@ -687,7 +689,8 @@ it('laradocs:lang refuses to overwrite without --force', function () {
 
     $this->artisan('laradocs:lang', ['locale' => 'fr'])->assertFailed();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array<string, mixed> $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings)->toBe(['keep' => true]);
 });
 
@@ -703,7 +706,8 @@ it('laradocs:lang overwrites with --force', function () use ($confirmTranslate) 
         ->expectsConfirmation($confirmTranslate, 'no')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array<string, mixed> $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings)->toHaveKey('nav');
 });
 
@@ -758,7 +762,8 @@ it('laradocs:lang --translate prompts for each string and writes translations to
         ->expectsQuestion('nav.next', 'Suivant')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings['nav']['home'])->toBe('Accueil')
         ->and($strings['nav']['next'])->toBe('Suivant');
 });
@@ -777,7 +782,8 @@ it('laradocs:lang translates when the interactive confirmation is accepted', fun
         ->expectsQuestion('nav.home', 'Accueil')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings['nav']['home'])->toBe('Accueil');
 });
 
@@ -794,7 +800,8 @@ it('laradocs:lang --translate keeps the original when the user presses Enter', f
         ->expectsQuestion('nav.home', 'Home')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings['nav']['home'])->toBe('Home');
 });
 
@@ -814,7 +821,8 @@ it('laradocs:lang --translate lets the user step back to revise a previous strin
         ->expectsQuestion('nav.next', 'Suivant')
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings['nav']['home'])->toBe('Accueil')
         ->and($strings['nav']['next'])->toBe('Suivant');
 });
@@ -835,7 +843,8 @@ it('laradocs:lang --translate preserves the comment header of the source file', 
         ->assertSuccessful();
 
     $contents = File::get($dir . '/vendor/laradocs/fr/laradocs.php');
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array{nav: array<string, string>} $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
 
     expect($contents)->toContain('Laradocs UI Strings')
         ->and($strings['nav']['home'])->toBe('Accueil');
@@ -853,7 +862,8 @@ it('laradocs:lang --translate is a no-op when the source has no strings', functi
     $this->artisan('laradocs:lang', ['locale' => 'fr', '--translate' => true])
         ->assertSuccessful();
 
-    $strings = require $dir . '/vendor/laradocs/fr/laradocs.php';
+    /** @var array<string, mixed> $strings */
+    $strings = File::getRequire($dir . '/vendor/laradocs/fr/laradocs.php');
     expect($strings)->toBe([]);
 });
 

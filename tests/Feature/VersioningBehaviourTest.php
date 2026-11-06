@@ -80,13 +80,17 @@ describe('VersionRegistry semver detection', function () {
     it('strips the v prefix when normalising to a semver string', function () {
         vbAutoDocs(['v2.0.0' => 'two']);
 
-        expect(vbRegistry()->get('v2.0.0')->semver)->toBe('2.0.0');
+        $info = vbRegistry()->get('v2.0.0');
+        expect($info)->not->toBeNull();
+        expect($info->semver)->toBe('2.0.0');
     });
 
     it('expands a partial handle 2.1 into 2.1.0', function () {
         vbAutoDocs(['2.1' => 'two-one']);
 
-        expect(vbRegistry()->get('2.1')->semver)->toBe('2.1.0');
+        $info = vbRegistry()->get('2.1');
+        expect($info)->not->toBeNull();
+        expect($info->semver)->toBe('2.1.0');
     });
 
     it('ignores non-semver directories during discovery', function () {
@@ -122,8 +126,11 @@ describe('VersionRegistry semver detection', function () {
             'v2.0' => ['label' => 'Version 2 (custom)'],
         ]);
 
+        $info = vbRegistry()->get('v2.0');
+        expect($info)->not->toBeNull();
+
         expect(vbRegistry()->all())->toHaveKey('v1.0')
-            ->and(vbRegistry()->get('v2.0')->label)->toBe('Version 2 (custom)');
+            ->and($info->label)->toBe('Version 2 (custom)');
     });
 });
 
@@ -183,7 +190,7 @@ describe('VersionInfo from _version.json', function () {
             'deprecated' => true,
             'hidden' => true,
             'deprecated_message' => 'Please upgrade to v2.',
-        ]));
+        ], JSON_THROW_ON_ERROR));
 
         $info = vbRegistry()->get('v1.0');
 
@@ -200,6 +207,8 @@ describe('VersionInfo from _version.json', function () {
         vbAutoDocs(['v1.0' => 'one']);
 
         $info = vbRegistry()->get('v1.0');
+
+        expect($info)->not->toBeNull();
 
         expect($info->label)->toBe('v1.0')
             ->and($info->stable)->toBeTrue()

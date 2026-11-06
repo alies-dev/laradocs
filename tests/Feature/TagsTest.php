@@ -76,6 +76,7 @@ it('exposes a tag as an array', function () {
 
     $tag = app(Laradocs::class)->tag('guide');
 
+    expect($tag)->not->toBeNull();
     expect($tag->toArray())->toBe([
         'slug' => 'guide',
         'label' => 'Guide',

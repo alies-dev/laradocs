@@ -113,10 +113,12 @@ it('honours a per-page x_card override from the seo: block', function () {
     ]);
 
     $html = $this->get('/docs/guide/summary')->assertOk()->getContent();
+    expect($html)->toBeString();
 
     // Our explicit tag is first; assert it appears before the package's auto-detected one
     $firstCard = strpos($html, 'name="twitter:card"');
     $summaryPos = strpos($html, 'content="summary"');
+    expect($summaryPos)->toBeInt();
 
     expect($firstCard)->toBeLessThan($summaryPos + 100)
         ->and($html)->toContain('content="summary"');
@@ -135,6 +137,7 @@ it('snapshot-tests the social meta block', function () {
     config()->set('laradocs.seo.x', 'acmedocs');
 
     $html = $this->get('/docs/guide/intro')->assertOk()->getContent();
+    expect($html)->toBeString();
 
     // Extract all og: and twitter: meta tags for a stable snapshot
     preg_match_all('/<meta [^>]*(?:property="og:|name="twitter:)[^>]*>/i', $html, $matches);

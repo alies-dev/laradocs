@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Laradocs\Deploy\CredentialStore;
 use Laradocs\Deploy\OAuthFlow;
@@ -56,7 +57,7 @@ function fakeOAuth(callable $login): void
 }
 
 it('logs in and stores the issued token', function () {
-    fakeOAuth(function (?callable $onPrompt) {
+    fakeOAuth(function (callable $onPrompt) {
         $onPrompt('https://deploy.test/oauth/authorize?x=1');
 
         return ['access_token' => 'fresh', 'refresh_token' => 'r', 'expires_in' => 3600];
@@ -66,7 +67,9 @@ it('logs in and stores the issued token', function () {
         ->expectsOutputToContain('oauth/authorize')
         ->assertSuccessful();
 
-    expect(app(CredentialStore::class)->forUrl(DEPLOY_URL)['access_token'])->toBe('fresh');
+    $token = app(CredentialStore::class)->forUrl(DEPLOY_URL);
+    expect($token)->not->toBeNull();
+    expect($token['access_token'])->toBe('fresh');
 });
 
 it('honours the --url option at login', function () {
@@ -107,7 +110,7 @@ it('uploads local markdown for a flat-site deploy', function () {
 
     $this->artisan('laradocs:deploy', ['--site' => 'acme'])->assertSuccessful();
 
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deploy')
+    Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/deploy')
         && ($request->data()['files']['index.md'] ?? null) === '# Index'
         && ($request->data()['files']['guide/intro.md'] ?? null) === '# Intro');
 });
@@ -125,7 +128,7 @@ it('deploys a git site from a tag ref', function () {
 
     $this->artisan('laradocs:deploy', ['--site' => 'acme', '--tag' => 'v1.2.0'])->assertSuccessful();
 
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deploy')
+    Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/deploy')
         && ($request->data()['ref'] ?? null) === 'v1.2.0');
 });
 
@@ -141,7 +144,7 @@ it('deploys a git site from the connected branch and reports a queued deploy', f
         ->expectsOutputToContain('queued')
         ->assertSuccessful();
 
-    Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deploy')
+    Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/deploy')
         && ! array_key_exists('ref', $request->data()));
 });
 
@@ -287,7 +290,7 @@ it('updates a remote config value', function () {
 
     $this->artisan('laradocs:config', ['key' => 'accent', 'value' => '#000000', '--site' => 'acme'])->assertSuccessful();
 
-    Http::assertSent(fn ($request) => $request->method() === 'PATCH'
+    Http::assertSent(fn (Request $request) => $request->method() === 'PATCH'
         && ($request->data()['config']['accent'] ?? null) === '#000000');
 });
 
@@ -333,7 +336,7 @@ it('pushes local config to the remote on sync when confirmed', function () {
         ->expectsConfirmation('Push these local values to the remote site?', 'yes')
         ->assertSuccessful();
 
-    Http::assertSent(fn ($request) => $request->method() === 'PATCH'
+    Http::assertSent(fn (Request $request) => $request->method() === 'PATCH'
         && ($request->data()['config']['accent'] ?? null) === '#123456');
 });
 
@@ -347,5 +350,5 @@ it('does not push on sync when declined', function () {
         ->expectsConfirmation('Push these local values to the remote site?', 'no')
         ->assertSuccessful();
 
-    Http::assertNotSent(fn ($request) => $request->method() === 'PATCH');
+    Http::assertNotSent(fn (Request $request) => $request->method() === 'PATCH');
 });

@@ -86,7 +86,7 @@ it('carries each page\'s content instead of a link to it', function () {
 
 it('interpolates variables in each page body', function () {
     $prefix = enableLlmsFull();
-    $this->app->make(VariableRegistry::class)->set('product', 'Acme');
+    app()->make(VariableRegistry::class)->set('product', 'Acme');
     $this->makeDocs(['a.md' => "---\ntitle: A\n---\nWelcome to {{ product }}.\n"]);
 
     $body = $this->get("/{$prefix}/llms-full.txt")->getContent();

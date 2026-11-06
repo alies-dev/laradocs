@@ -79,12 +79,15 @@ it('gives every synthetic document a distinct path and relativePath', function (
 
     // Each reference embeds the spec file and the operation key.
     $overview = $documents->findBySlug('api');
+    expect($overview)->not->toBeNull();
     expect($overview->path)->toContain('petstore-3.0.yaml#overview');
 });
 
 it('embeds the active locale in the document path so locale variants do not collide', function () use ($fixtures) {
     $en = makeOpenApiLoader($fixtures, 'en')->all()->findBySlug('api/pets/list-all-pets');
     $fr = makeOpenApiLoader($fixtures, 'fr')->all()->findBySlug('api/pets/list-all-pets');
+    expect($en)->not->toBeNull();
+    expect($fr)->not->toBeNull();
 
     expect($en->path)->toContain('@en')
         ->and($fr->path)->toContain('@fr')
@@ -150,6 +153,7 @@ it('resolves filesystem documents before OpenApi documents on a slug collision',
 
     // Filesystem wins the "api" slug collision...
     $resolved = $composite->find('api');
+    expect($resolved)->not->toBeNull();
     expect($resolved->title())->toBe('Hand-written API page')
         ->and($resolved->markdown)->toBe('# API');
 

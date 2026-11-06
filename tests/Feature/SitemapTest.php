@@ -93,11 +93,14 @@ it('orders sitemap entries by tree order (parents before children)', function ()
     ]);
 
     $body = $this->get('/docs/sitemap.xml')->getContent();
+    expect($body)->toBeString();
 
     $guidePos = strpos($body, '/docs/guide</loc>');
     $introPos = strpos($body, '/docs/guide/intro');
     $advancedPos = strpos($body, '/docs/guide/advanced');
     $referencePos = strpos($body, '/docs/reference');
+    expect($introPos)->toBeInt();
+    expect($advancedPos)->toBeInt();
 
     expect($guidePos)->toBeInt()
         ->and($introPos)->toBeGreaterThan($guidePos)

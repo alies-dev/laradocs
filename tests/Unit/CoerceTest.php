@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Laradocs\Tests\Unit;
+
 use Laradocs\OpenApi\Coerce;
 
 it('narrows scalars and falls back for unexpected types', function () {

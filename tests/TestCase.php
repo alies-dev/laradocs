@@ -6,6 +6,7 @@ namespace Laradocs\Tests;
 
 use Dedoc\Scramble\ScrambleServiceProvider;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Laradocs\LaradocsServiceProvider;
 use Laravel\Ai\AiServiceProvider;
 use Laravel\Mcp\Server\McpServiceProvider;
@@ -34,6 +35,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
+     * @param  Application  $app
      * @return array<int, class-string>
      */
     #[\Override]

@@ -67,7 +67,7 @@ it('returns json with an error key on 401', function () {
         fn () => new Response('should not reach'),
     );
 
-    $body = json_decode($response->getContent(), true);
+    $body = json_decode((string) $response->getContent(), true);
 
     expect($body)->toHaveKey('error')
         ->and($body['error'])->toBe('Unauthenticated');

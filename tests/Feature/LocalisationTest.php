@@ -170,7 +170,7 @@ it('falls through to the query/cookie/browser chain when the request has no boun
 
     $response = (new SetDocsLocale)->handle(
         $request,
-        fn () => response((string) app()->getLocale()),
+        fn () => response(app()->getLocale()),
     );
 
     expect($response->getContent())->toBe('fr');

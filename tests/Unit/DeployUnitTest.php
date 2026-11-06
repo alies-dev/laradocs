@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Laradocs\Deploy\ApiException;
 use Laradocs\Deploy\CredentialStore;
@@ -69,7 +70,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-    if (isset($this->credPath) && is_string($this->credPath)) {
+    if (isset($this->credPath)) {
         @unlink($this->credPath);
     }
 });
@@ -79,7 +80,7 @@ it('stores and reads credentials with a computed expiry', function () {
     $store->store('https://a.test', ['access_token' => 'abc', 'refresh_token' => 'ref', 'expires_in' => 3600]);
 
     $token = $store->forUrl('https://a.test');
-
+    expect($token)->not->toBeNull();
     expect($token['access_token'])->toBe('abc')
         ->and($token['refresh_token'])->toBe('ref')
         ->and($token['token_type'])->toBe('Bearer')
@@ -91,7 +92,7 @@ it('stores credentials without expiry or refresh token', function () {
     $store->store('https://a.test', ['access_token' => 'abc']);
 
     $token = $store->forUrl('https://a.test');
-
+    expect($token)->not->toBeNull();
     expect($token['expires_at'])->toBeNull()
         ->and($token['refresh_token'])->toBeNull();
 });
@@ -104,7 +105,7 @@ it('returns null when a stored entry is not a usable token', function () {
     (new Filesystem)->put($this->credPath, json_encode([
         'https://scalar.test' => 'just-a-string',
         'https://nokey.test' => ['token_type' => 'Bearer'],
-    ]));
+    ], JSON_THROW_ON_ERROR));
 
     $store = credentialStore();
 
@@ -187,6 +188,7 @@ it('captures a callback over a real loopback socket', function () {
     expect($server->port())->toBeGreaterThan(0);
 
     $client = stream_socket_client('tcp://127.0.0.1:' . $server->port(), $errno, $errstr, 2);
+    expect($client)->toBeResource();
     fwrite($client, "GET /callback?code=abc&state=xyz HTTP/1.1\r\nHost: localhost\r\n\r\n");
 
     $query = $server->awaitCallback(2);
@@ -353,7 +355,7 @@ it('lets a subclass widen the scopes, in the authorize url and the refresh alike
 
     $flow->refresh('rt');
 
-    Http::assertSent(fn ($request) => $request['scope'] === $widened);
+    Http::assertSent(fn (Request $request) => $request['scope'] === $widened);
 });
 
 it('completes login end to end over a real loopback socket', function () {
@@ -378,6 +380,7 @@ it('completes login end to end over a real loopback socket', function () {
         {
             parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
             $client = stream_socket_client('tcp://127.0.0.1:' . $this->port, $errno, $errstr, 2);
+            expect($client)->toBeResource();
             fwrite($client, "GET /callback?code=the-code&state={$q['state']} HTTP/1.1\r\nHost: localhost\r\n\r\n");
             fclose($client);
         }
@@ -391,7 +394,7 @@ it('completes login end to end over a real loopback socket', function () {
     expect($token['access_token'])->toBe('tok')
         ->and($prompted)->toContain('https://login.test/oauth/authorize');
 
-    Http::assertSent(fn ($request) => str_contains($request->url(), '/oauth/token')
+    Http::assertSent(fn (Request $request) => str_contains($request->url(), '/oauth/token')
         && $request['grant_type'] === 'authorization_code'
         && $request['code'] === 'the-code');
 });
@@ -415,6 +418,7 @@ it('throws when the token exchange fails during login', function () {
         {
             parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
             $client = stream_socket_client('tcp://127.0.0.1:' . $this->port, $errno, $errstr, 2);
+            expect($client)->toBeResource();
             fwrite($client, "GET /callback?code=c&state={$q['state']} HTTP/1.1\r\n\r\n");
             fclose($client);
         }
@@ -441,6 +445,7 @@ it('rejects a mismatched state returned from authorization', function () {
 function freePort(): int
 {
     $socket = stream_socket_server('tcp://127.0.0.1:0');
+    expect($socket)->toBeResource();
     $name = (string) stream_socket_get_name($socket, false);
     fclose($socket);
 

@@ -144,7 +144,7 @@ it('advertises every tool a configured server offers', function (): void {
     expect(array_map(fn (object $tool): string => $tool->name, $tools))
         ->toBe(['lookup_invoice', 'refund']);
 
-    Http::assertSent(fn ($request): bool => $request->hasHeader('Authorization', 'Bearer a-secret')
+    Http::assertSent(fn (Request $request): bool => $request->hasHeader('Authorization', 'Bearer a-secret')
         && $request->hasHeader('X-Tenant', 'acme'));
 });
 

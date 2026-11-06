@@ -117,7 +117,8 @@ it('escapes the version-block spec so it cannot break out of its attribute', fun
     // once the parser (html_input => allow) has passed the block through.
     $div = Html::load(app(DocumentParser::class)->parse($out))
         ->getElementsByTagName('div')->item(0);
+    assert($div instanceof DOMElement);
 
-    expect($div?->hasAttribute('onmouseover'))->toBeFalse()
-        ->and($div?->getAttribute('data-version-since'))->toBe('1.0" onmouseover="alert(1)');
+    expect($div->hasAttribute('onmouseover'))->toBeFalse()
+        ->and($div->getAttribute('data-version-since'))->toBe('1.0" onmouseover="alert(1)');
 });

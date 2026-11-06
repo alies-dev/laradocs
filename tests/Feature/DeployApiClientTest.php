@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Laradocs\Deploy\ApiClient;
 use Laradocs\Deploy\ApiException;
@@ -73,10 +74,13 @@ it('refreshes an expired access token before the request', function () {
 
     $site = app(ApiClient::class)->getSite('acme');
 
-    expect($site['slug'])->toBe('acme')
-        ->and(app(CredentialStore::class)->forUrl(API_URL)['access_token'])->toBe('refreshed');
+    $token = app(CredentialStore::class)->forUrl(API_URL);
+    expect($token)->not->toBeNull();
 
-    Http::assertSent(fn ($request) => str_contains($request->url(), '/oauth/token')
+    expect($site['slug'])->toBe('acme')
+        ->and($token['access_token'])->toBe('refreshed');
+
+    Http::assertSent(fn (Request $request) => str_contains($request->url(), '/oauth/token')
         && $request['grant_type'] === 'refresh_token');
 });
 
@@ -92,7 +96,7 @@ it('refreshes and retries once on a 401', function () {
 
     expect(app(ApiClient::class)->getSite('acme')['slug'])->toBe('acme');
 
-    Http::assertSent(fn ($request) => str_contains($request->url(), '/oauth/token'));
+    Http::assertSent(fn (Request $request) => str_contains($request->url(), '/oauth/token'));
 });
 
 it('throws an ApiException on a non-401 failure', function () {

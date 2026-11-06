@@ -172,10 +172,13 @@ it('sorts items by updated_at front-matter descending', function () {
     ]);
 
     $body = $this->get('/docs/feed.xml')->getContent();
+    expect($body)->toBeString();
 
     $newPos = strpos($body, 'New');
     $midPos = strpos($body, 'Mid');
     $oldPos = strpos($body, 'Old');
+    expect($midPos)->toBeInt();
+    expect($oldPos)->toBeInt();
 
     expect($newPos)->toBeLessThan($midPos)
         ->and($midPos)->toBeLessThan($oldPos);
@@ -216,6 +219,7 @@ it('respects the configured feed limit', function () {
     ]);
 
     $body = $this->get('/docs/feed.xml')->getContent();
+    expect($body)->toBeString();
 
     // C and B are the two most recent; A should be excluded
     expect($body)->toContain('<title>C</title>')

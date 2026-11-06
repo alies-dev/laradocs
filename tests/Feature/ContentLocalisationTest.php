@@ -68,8 +68,11 @@ it('serves a translation that lives under the default-locale page on its shared 
 
     // A page and its translation collapse to a single slug, so the public URL
     // is stable across languages.
+    $first = $loader->all()->first();
+    expect($first)->not->toBeNull();
+
     expect($loader->all())->toHaveCount(1)
-        ->and($loader->all()->first()->slug)->toBe('guide');
+        ->and($first->slug)->toBe('guide');
 });
 
 it('tags an un-suffixed page with the default content locale', function () {
@@ -77,7 +80,10 @@ it('tags an un-suffixed page with the default content locale', function () {
         'guide.md' => "---\ntitle: Guide\n---\nbody\n",
     ]);
 
-    expect(app(DocumentLoader::class)->all()->first()->locale)->toBe('en');
+    $doc = app(DocumentLoader::class)->all()->first();
+    expect($doc)->not->toBeNull();
+
+    expect($doc->locale)->toBe('en');
 });
 
 it('tags a suffixed page with its detected locale', function () {
@@ -101,6 +107,7 @@ it('does not mistake an ordinary dotted filename for a translation', function ()
 
     $doc = app(DocumentLoader::class)->all()->first();
 
+    expect($doc)->not->toBeNull();
     expect($doc->slug)->toBe('configexample')
         ->and($doc->locale)->toBe('en');
 });
@@ -111,7 +118,10 @@ it('does not mistake a directory that merely shares a non-locale name', function
         'guides/intro.md' => "---\ntitle: Intro\n---\nbody\n",
     ]);
 
-    expect(app(DocumentLoader::class)->all()->first()->slug)->toBe('guides/intro');
+    $doc = app(DocumentLoader::class)->all()->first();
+    expect($doc)->not->toBeNull();
+
+    expect($doc->slug)->toBe('guides/intro');
 });
 
 it('leaves content untouched when no content locales are recognised', function () {

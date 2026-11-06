@@ -219,7 +219,7 @@ it('answers only from the documents the reader may read', function (): void {
     // The assistant reads through the same loader as every other read path, so
     // a rule that hides a page hides it from the assistant's tools too.
     // Asserted through the tool the assistant would actually call.
-    $this->app->bind(DocumentVisibility::class, fn (): DocumentVisibility => new class implements DocumentVisibility
+    app()->bind(DocumentVisibility::class, fn (): DocumentVisibility => new class implements DocumentVisibility
     {
         #[Override]
         public function filter(DocumentCollection $documents): DocumentCollection

@@ -17,6 +17,8 @@ function symlinkAwareFilesystem(): void
     app()->bind(Filesystem::class, fn (): Filesystem => new class extends Filesystem
     {
         /**
+         * @param  string  $directory
+         * @param  bool  $hidden
          * @return array<int, SplFileInfo>
          */
         #[Override]

@@ -67,13 +67,16 @@ it('parses the emitted spec cleanly through OpenApiParser', function (): void {
 
     // The FormRequest-backed POST surfaces its inferred request body...
     $store = $operations->first(fn ($op) => $op->method === 'POST' && $op->path === '/api/orders');
+    expect($store)->not->toBeNull();
     $body = $store->requestBody;
+    expect($body)->not->toBeNull();
     expect($body)->not->toBe([]);
     $schema = $body['content']['application/json']['schema'];
     expect($schema['properties'])->toHaveKeys(['reference', 'quantity', 'email', 'status']);
 
     // ...and the JsonResource-backed GET surfaces its inferred response schema.
     $show = $operations->first(fn ($op) => $op->method === 'GET' && $op->path === '/api/orders/{order}');
+    expect($show)->not->toBeNull();
     expect($show->responses)->toHaveKey('200');
 });
 
@@ -86,6 +89,7 @@ it('applies attribute and docblock overrides over the inferred values', function
     // index() carries an #[ApiOperation] attribute: summary, tags and the
     // deprecated flag all override the inferred values.
     $index = $operations->first(fn ($op) => $op->method === 'GET' && $op->path === '/api/orders');
+    expect($index)->not->toBeNull();
     expect($index->summary)->toBe('List all orders')
         ->and($index->tags)->toContain('Orders')
         ->and($index->deprecated)->toBeTrue();
@@ -93,6 +97,7 @@ it('applies attribute and docblock overrides over the inferred values', function
     // show() carries no attribute — its summary/description come from the
     // action docblock instead.
     $show = $operations->first(fn ($op) => $op->method === 'GET' && $op->path === '/api/orders/{order}');
+    expect($show)->not->toBeNull();
     expect($show->summary)->toBe('Show a single order.')
         ->and($show->description)->toContain('identified by the given id')
         ->and($show->deprecated)->toBeFalse();

@@ -77,6 +77,8 @@ it('normalises partial and prefixed handles into a semver string', function () {
         '3/index.md' => "# b\n",
     ]);
 
+    // PHP stores the numeric handle '3' as an int key.
+    /** @var array<array-key, VersionInfo> $all */
     $all = registry()->all();
 
     expect($all['v2.1']->semver)->toBe('2.1.0')
@@ -124,9 +126,10 @@ it('maps _version.json fields onto VersionInfo', function () {
         'deprecated' => true,
         'hidden' => true,
         'deprecated_message' => 'Please upgrade to v2.',
-    ]));
+    ], JSON_THROW_ON_ERROR));
 
     $info = registry()->get('v1.0');
+    expect($info)->not->toBeNull();
 
     expect($info->label)->toBe('Version 1 (legacy)')
         ->and($info->semver)->toBe('1.0.0')
@@ -142,6 +145,7 @@ it('defaults a version to stable with the handle as its label', function () {
     ]);
 
     $info = registry()->get('v1.0');
+    expect($info)->not->toBeNull();
 
     expect($info->label)->toBe('v1.0')
         ->and($info->stable)->toBeTrue()
@@ -177,8 +181,10 @@ it('latest() returns the highest non-pre-release handle', function () {
         'v3.0.0-beta.1/index.md' => "# c\n",
     ]);
 
+    $highest = registry()->get('v2.0.0');
+    expect($highest)->not->toBeNull();
     expect(registry()->latest())->toBe('v2.0.0')
-        ->and(registry()->get('v2.0.0')->latest)->toBeTrue();
+        ->and($highest->latest)->toBeTrue();
 });
 
 it('latest() falls back to the highest pre-release when none are stable releases', function () {

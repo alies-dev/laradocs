@@ -434,7 +434,7 @@ function bindFakeMeilisearchScout(?Closure $onUpdate = null): MeilisearchClient
         }
 
         #[Override]
-        public function waitForTask($uid, int $timeoutInMs = 5000, int $intervalInMs = 50): array
+        public function waitForTask(mixed $uid, int $timeoutInMs = 5000, int $intervalInMs = 50): array
         {
             foreach ($this->taskLog as &$task) {
                 if (($task['uid'] ?? null) === $uid && ($task['status'] ?? null) !== 'failed') {

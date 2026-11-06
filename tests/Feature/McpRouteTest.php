@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Route;
 use Laradocs\Http\Controllers\McpController;
 use Laradocs\Http\Middleware\EnsureDocsEnabled;
@@ -48,7 +47,7 @@ it('excludes csrf middleware so non-browser clients can call it', function () {
     $excluded = laradocsMcpRoute()->excludedMiddleware();
 
     expect($excluded)
-        ->toContain(VerifyCsrfToken::class)
+        ->toContain('Illuminate\Foundation\Http\Middleware\VerifyCsrfToken')
         ->toContain(PreventRequestForgery::class);
 });
 

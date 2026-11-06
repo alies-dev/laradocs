@@ -96,8 +96,11 @@ it('leads the corpus with the docs index page', function () {
 
     // The docs landing page belongs to no section, so it is emitted first —
     // ahead of every page it introduces, matching llms.txt's leading list.
+    $intro = strpos($body, 'Intro body.');
+    expect($intro)->toBeInt();
+
     expect($body)->toContain('Home body.')
-        ->and(strpos($body, 'Home body.'))->toBeLessThan(strpos($body, 'Intro body.'));
+        ->and(strpos($body, 'Home body.'))->toBeLessThan($intro);
 });
 
 it('excludes the docs index page when it is hidden', function () {

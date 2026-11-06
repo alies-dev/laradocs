@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use Laradocs\Tests\Fixtures\FakeScoutEngine;
+use Laradocs\Tests\TestCase;
 use Laravel\Scout\EngineManager;
 
 // Helpers — re-run a search and return the ordered list of slugs.
-function searchSlugs(mixed $test, string $query): array
+function searchSlugs(TestCase $test, string $query): array
 {
     return array_column(
         $test->getJson("/docs/_laradocs/search?q={$query}")->assertOk()->json('results'),
@@ -24,7 +25,9 @@ it('search_rank: 2.0 boosts a page above an equally relevant result', function (
 
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('boosted', $slugs))->toBeLessThan(array_search('normal', $slugs));
+    $normal = array_search('normal', $slugs);
+    expect($normal)->toBeInt();
+    expect(array_search('boosted', $slugs))->toBeLessThan($normal);
 });
 
 it('search_rank: 0.5 demotes a page below an equally relevant result', function () {
@@ -35,7 +38,9 @@ it('search_rank: 0.5 demotes a page below an equally relevant result', function 
 
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('demoted', $slugs))->toBeGreaterThan(array_search('normal', $slugs));
+    $normal = array_search('normal', $slugs);
+    expect($normal)->toBeInt();
+    expect(array_search('demoted', $slugs))->toBeGreaterThan($normal);
 });
 
 it('search_rank: 0 sends a page to the bottom', function () {
@@ -71,7 +76,9 @@ it('config rank pattern boosts matching pages above unranked equals', function (
 
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('guide/intro', $slugs))->toBeLessThan(array_search('other', $slugs));
+    $other = array_search('other', $slugs);
+    expect($other)->toBeInt();
+    expect(array_search('guide/intro', $slugs))->toBeLessThan($other);
 });
 
 it('config rank pattern demotes matching pages below unranked equals', function () {
@@ -84,7 +91,9 @@ it('config rank pattern demotes matching pages below unranked equals', function 
 
     $slugs = searchSlugs($this, 'release');
 
-    expect(array_search('changelog', $slugs))->toBeGreaterThan(array_search('guide', $slugs));
+    $guide = array_search('guide', $slugs);
+    expect($guide)->toBeInt();
+    expect(array_search('changelog', $slugs))->toBeGreaterThan($guide);
 });
 
 it('first matching config pattern wins when multiple patterns match', function () {
@@ -101,7 +110,9 @@ it('first matching config pattern wins when multiple patterns match', function (
     $slugs = searchSlugs($this, 'composer');
 
     // intro matches the 5.0 pattern first → ranked above advanced (0.1)
-    expect(array_search('guide/intro', $slugs))->toBeLessThan(array_search('guide/advanced', $slugs));
+    $advanced = array_search('guide/advanced', $slugs);
+    expect($advanced)->toBeInt();
+    expect(array_search('guide/intro', $slugs))->toBeLessThan($advanced);
 });
 
 // ─── Per-page and config rank combine ────────────────────────────────────────
@@ -117,7 +128,9 @@ it('per-page and config rank multiply together', function () {
     // guide/intro final rank = 2.0 * 3.0 = 6.0 vs other = 1.0
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('guide/intro', $slugs))->toBeLessThan(array_search('other', $slugs));
+    $other = array_search('other', $slugs);
+    expect($other)->toBeInt();
+    expect(array_search('guide/intro', $slugs))->toBeLessThan($other);
 });
 
 // ─── Scout engine re-ranking ─────────────────────────────────────────────────
@@ -169,7 +182,9 @@ it('scout re-ranks a boosted page above higher-relevance results', function () {
     // After rank: c = 1 × 4.0 = 4 → overtakes a (3×1=3) and b (2×1=2).
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('c', $slugs))->toBeLessThan(array_search('a', $slugs));
+    $a = array_search('a', $slugs);
+    expect($a)->toBeInt();
+    expect(array_search('c', $slugs))->toBeLessThan($a);
 });
 
 it('scout demotes a page with a low rank below lower-relevance results', function () {
@@ -186,7 +201,9 @@ it('scout demotes a page with a low rank below lower-relevance results', functio
     // Scout returns a=3, b=2, c=1. After rank: c = 1 × 0.1 = 0.1 → last.
     $slugs = searchSlugs($this, 'composer');
 
-    expect(array_search('c', $slugs))->toBeGreaterThan(array_search('b', $slugs));
+    $b = array_search('b', $slugs);
+    expect($b)->toBeInt();
+    expect(array_search('c', $slugs))->toBeGreaterThan($b);
 });
 
 it('per-page rank of 0 beats a high config pattern rank', function () {
@@ -200,5 +217,7 @@ it('per-page rank of 0 beats a high config pattern rank', function () {
     $slugs = searchSlugs($this, 'composer');
 
     // 10.0 * 0 = 0 → zeroed goes to the bottom
-    expect(array_search('guide/zeroed', $slugs))->toBeGreaterThan(array_search('other', $slugs));
+    $other = array_search('other', $slugs);
+    expect($other)->toBeInt();
+    expect(array_search('guide/zeroed', $slugs))->toBeGreaterThan($other);
 });

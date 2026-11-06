@@ -73,6 +73,7 @@ it('parses a 3.1 spec into a normalized spec', function () use ($fixtures) {
         ->and($spec->schemas())->toHaveKey('Pet');
 
     $delete = collect($spec->operations())->firstWhere('operationId', 'deletePet');
+    expect($delete)->not->toBeNull();
     expect($delete->method)->toBe('DELETE')
         ->and($delete->path)->toBe('/pets/{petId}')
         ->and($delete->deprecated)->toBeTrue();
@@ -137,7 +138,7 @@ it('reparses when the spec mtime changes', function () use ($fixtures) {
         expect($first->info()['title'])->toBe('Petstore 3.0');
 
         // Rewrite the file with different content and a newer mtime.
-        $changed = str_replace('Petstore 3.0', 'Petstore Changed', file_get_contents($path));
+        $changed = str_replace('Petstore 3.0', 'Petstore Changed', (string) file_get_contents($path));
         file_put_contents($path, $changed);
         touch($path, time() + 30);
         clearstatcache(true, $path);

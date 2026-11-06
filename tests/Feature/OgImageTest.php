@@ -63,6 +63,7 @@ it('serves a generated card as image/png for a document', function () {
 
 it('advertises the generated card dimensions and a single twitter:card', function () {
     $html = $this->get('/docs/guide/intro')->assertOk()->getContent();
+    expect($html)->toBeString();
 
     expect($html)
         ->toContain('og:image:width')
@@ -85,7 +86,7 @@ it('404s when the page does not exist', function () {
 });
 
 it('redirects to a front-matter image instead of generating (front-matter trumps generation)', function () {
-    $this->app->instance(OgImageGenerator::class, $generator = fakeOgGenerator());
+    app()->instance(OgImageGenerator::class, $generator = fakeOgGenerator());
 
     $this->get('/docs/_laradocs/og/guide/imaged')
         ->assertRedirect('https://example.com/page.png');
@@ -101,7 +102,7 @@ it('redirects to a site-wide seo.image instead of generating', function () {
 });
 
 it('uses a custom OgImageGenerator binding', function () {
-    $this->app->instance(OgImageGenerator::class, fakeOgGenerator('CUSTOM-BYTES'));
+    app()->instance(OgImageGenerator::class, fakeOgGenerator('CUSTOM-BYTES'));
 
     $response = $this->get('/docs/_laradocs/og/guide/intro')->assertOk();
 
@@ -110,7 +111,7 @@ it('uses a custom OgImageGenerator binding', function () {
 
 it('caches a generated card so it renders once', function () {
     config()->set('laradocs.cache.enabled', true);
-    $this->app->instance(OgImageGenerator::class, $generator = fakeOgGenerator());
+    app()->instance(OgImageGenerator::class, $generator = fakeOgGenerator());
 
     $this->get('/docs/_laradocs/og/guide/intro')->assertOk();
     $this->get('/docs/_laradocs/og/guide/intro')->assertOk();

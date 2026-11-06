@@ -102,6 +102,7 @@ it('infers a request body schema from a FormRequest', function (): void {
     $route = collect((new RouteCollector($router, 'api', 'api'))->collect())
         ->firstWhere('action', 'store');
 
+    expect($route)->not->toBeNull();
     $request = (new RequestInspector)->inspect($route);
 
     expect($request['properties'])->toHaveKeys(['reference', 'quantity', 'email', 'status', 'notes', 'items'])
@@ -119,6 +120,7 @@ it('infers params from a detectable inline validate() call', function (): void {
     $route = collect((new RouteCollector($router, 'api', 'api'))->collect())
         ->firstWhere('action', 'search');
 
+    expect($route)->not->toBeNull();
     $request = (new RequestInspector)->inspect($route);
 
     expect($request['properties'])->toHaveKeys(['term', 'limit'])
@@ -132,11 +134,14 @@ it('derives a response schema from a JsonResource return type', function (): voi
     $route = collect((new RouteCollector($router, 'api', 'api'))->collect())
         ->firstWhere('action', 'show');
 
+    expect($route)->not->toBeNull();
     $response = (new ResponseInspector)->inspect($route);
 
+    $schema = $response['schema'];
+    expect($schema)->not->toBeNull();
     expect($response['status'])->toBe('200')
-        ->and($response['schema']['type'])->toBe('object')
-        ->and($response['schema']['properties'])->toHaveKeys(['id', 'reference', 'status']);
+        ->and($schema['type'])->toBe('object')
+        ->and($schema['properties'])->toHaveKeys(['id', 'reference', 'status']);
 });
 
 it('derives an array response schema from a ResourceCollection', function (): void {
@@ -145,11 +150,16 @@ it('derives an array response schema from a ResourceCollection', function (): vo
     $route = collect((new RouteCollector($router, 'api', 'api'))->collect())
         ->firstWhere('action', 'index');
 
+    expect($route)->not->toBeNull();
     $response = (new ResponseInspector)->inspect($route);
 
-    expect($response['schema']['type'])->toBe('array')
-        ->and($response['schema']['items']['type'])->toBe('object')
-        ->and($response['schema']['items']['properties'])->toHaveKeys(['id', 'reference', 'status']);
+    $schema = $response['schema'];
+    expect($schema)->not->toBeNull();
+    $items = $schema['items'];
+    expect($items)->not->toBeNull();
+    expect($schema['type'])->toBe('array')
+        ->and($items['type'])->toBe('object')
+        ->and($items['properties'])->toHaveKeys(['id', 'reference', 'status']);
 });
 
 it('uses a 201 status for POST-only routes', function (): void {
@@ -158,6 +168,7 @@ it('uses a 201 status for POST-only routes', function (): void {
     $route = collect((new RouteCollector($router, 'api', 'api'))->collect())
         ->firstWhere('action', 'store');
 
+    expect($route)->not->toBeNull();
     expect((new ResponseInspector)->inspect($route)['status'])->toBe('201');
 });
 
@@ -300,8 +311,10 @@ it('degrades gracefully for unresolvable or non-resource responses', function ()
 
     // A ResourceCollection without $collects yields an array of empty objects.
     $bare = $inspect('returnsBareCollection');
-    expect($bare['schema']['type'])->toBe('array')
-        ->and($bare['schema']['items'])->toBe(['type' => 'object']);
+    $bareSchema = $bare['schema'];
+    expect($bareSchema)->not->toBeNull();
+    expect($bareSchema['type'])->toBe('array')
+        ->and($bareSchema['items'])->toBe(['type' => 'object']);
 });
 
 it('handles closure routes and empty request bodies in the assembled document', function (): void {

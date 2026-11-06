@@ -20,7 +20,7 @@ function withoutSigning(): void
  */
 function pixel(): string
 {
-    return (string) base64_decode(
+    return base64_decode(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
     );
 }

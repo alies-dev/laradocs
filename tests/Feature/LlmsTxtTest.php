@@ -89,10 +89,12 @@ it('emits one H2 per top-level section with the section index listed first', fun
     ]);
 
     $body = $this->get('/docs/llms.txt')->getContent();
+    expect($body)->toBeString();
 
     $heading = strpos($body, "\n## Guide\n");
     $index = strpos($body, '- [Guide](');
     $intro = strpos($body, '- [Intro](');
+    expect($index)->toBeInt();
 
     expect($heading)->toBeInt()
         ->and($index)->toBeGreaterThan($heading)
@@ -108,6 +110,7 @@ it('lists nested pages under their top-level section in tree order', function ()
     ]);
 
     $body = $this->get('/docs/llms.txt')->getContent();
+    expect($body)->toBeString();
 
     $intro = strpos($body, '- [Intro](');
     $deep = strpos($body, '- [Deep](');
@@ -128,8 +131,12 @@ it('orders sections by tree order', function () {
     ]);
 
     $body = $this->get('/docs/llms.txt')->getContent();
+    expect($body)->toBeString();
 
-    expect(strpos($body, '## Zebra'))->toBeLessThan(strpos($body, '## Alpha'));
+    $alpha = strpos($body, '## Alpha');
+    expect($alpha)->toBeInt();
+
+    expect(strpos($body, '## Zebra'))->toBeLessThan($alpha);
 });
 
 it('derives a bullet description from the page body when front-matter has none', function () {
@@ -175,6 +182,7 @@ it('flattens a multi-line description onto a single line', function () {
     ]);
 
     $body = $this->get('/docs/llms.txt')->getContent();
+    expect($body)->toBeString();
 
     expect($body)->toContain(': first line second line')
         ->and(substr_count($body, '- [A]'))->toBe(1);

@@ -5,10 +5,11 @@ declare(strict_types=1);
 use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Gate;
 use Laradocs\Ai\ChatExchange;
+use Laradocs\Ai\ChatMessage;
 use Laradocs\Ai\ChatService;
 use Laradocs\Ai\DocsAgent;
 use Laradocs\Facades\Laradocs;
-use Laravel\Ai\Exceptions\FailoverableException;
+use Laravel\Ai\Exceptions\ProviderOverloadedException;
 
 const AI_ENDPOINT = '/docs/_laradocs/ai/chat';
 
@@ -114,8 +115,10 @@ it('replays the thread the client sends, newest turns first to be kept', functio
         ],
     ])->assertOk();
 
+    expect($seen)->not->toBeNull();
+
     expect(array_map(
-        fn ($message): string => $message->content,
+        fn (ChatMessage $message): string => $message->content,
         $seen->request->history,
     ))->toBe(['middle', 'newest']);
 });
@@ -135,6 +138,7 @@ it('drops the thread entirely when history is switched off', function (): void {
         'history' => [['role' => 'user', 'content' => 'oldest']],
     ])->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->request->history)->toBe([]);
 });
 
@@ -158,6 +162,7 @@ it('answers from the pages of the version the reader is on', function (): void {
     $this->postJson(AI_ENDPOINT, ['message' => 'How do I install?', 'stream' => false, 'version' => 'v2'])
         ->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->request->version)->toBe('v2')
         // The tools read the version the reader is on, not the default.
         ->and($readable)->toContain('new-way')
@@ -185,6 +190,7 @@ it('falls back to the default version when the one sent is not recognised', func
     $this->postJson(AI_ENDPOINT, ['message' => 'hello', 'stream' => false, 'version' => 'v99'])
         ->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->request->version)->toBe('v1');
 });
 
@@ -205,6 +211,7 @@ it('falls back to the first version when none is configured as the default', fun
 
     $this->postJson(AI_ENDPOINT, ['message' => 'hello', 'stream' => false])->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->request->version)->toBe('v2');
 });
 
@@ -219,12 +226,13 @@ it('carries no version at all on a single-version site', function (): void {
     $this->postJson(AI_ENDPOINT, ['message' => 'hello', 'stream' => false, 'version' => 'v2'])
         ->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->request->version)->toBeNull();
 });
 
 it('turns a provider failure into a bad gateway rather than a stack trace', function (): void {
     DocsAgent::fake(function (): never {
-        throw new FailoverableException('the provider is down');
+        throw new ProviderOverloadedException('the provider is down');
     });
 
     $this->postJson(AI_ENDPOINT, ['message' => 'hello', 'stream' => false])
@@ -282,6 +290,7 @@ it('hands the authenticated reader to the registered callbacks', function (): vo
 
     $this->postJson(AI_ENDPOINT, ['message' => 'hello', 'stream' => false])->assertOk();
 
+    expect($seen)->not->toBeNull();
     expect($seen->user())->toBe($user);
 });
 

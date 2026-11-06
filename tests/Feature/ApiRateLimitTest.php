@@ -103,6 +103,7 @@ it('the named limiter callback yields an unlimited limit when disabled', functio
     Laradocs::rateLimit(false);
 
     $limiter = RateLimiter::limiter('laradocs-api');
+    expect($limiter)->not->toBeNull();
     $limit = $limiter(Request::create('/docs/_laradocs/api/tree'));
 
     expect($limit)->toBeInstanceOf(Unlimited::class);
