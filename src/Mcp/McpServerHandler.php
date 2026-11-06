@@ -58,7 +58,7 @@ final class McpServerHandler
      * whichever version happens to be installed: building the v0.9 argument
      * list under v1 is harmless, whereas constructing with it is a TypeError.
      *
-     * @return array<int, mixed>
+     * @return list<mixed>
      */
     private function transportArguments(Request $request): array
     {

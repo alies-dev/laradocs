@@ -96,7 +96,7 @@ final class MacroRegistry
 
         // The view name comes from user configuration, so it cannot be known
         // to be a registered view at analysis time.
-        /** @var view-string $handler */
+        /** @phpstan-var view-string $handler */
         return $factory->make($handler, $data)->render();
     }
 }

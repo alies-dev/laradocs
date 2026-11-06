@@ -82,7 +82,7 @@ final class Html
         $html = '';
 
         foreach ($node->childNodes as $child) {
-            $html .= $node->ownerDocument?->saveHTML($child) ?? '';
+            $html .= (string) $node->ownerDocument?->saveHTML($child);
         }
 
         return $html;

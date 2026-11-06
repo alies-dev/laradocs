@@ -33,6 +33,8 @@ final class DocumentTree
         $rootSlugs = [];
         $rootDocument = null;
 
+        // Iterating a Laravel Collection is side-effect free here; Psalm 7 reads it as impure.
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($documents as $document) {
             $segments = $document->segments();
 
@@ -156,6 +158,9 @@ final class DocumentTree
 
         $last = $segments[count($segments) - 1];
 
+        // The by-reference arguments are local build-up arrays and Str::of() is a pure string
+        // helper, so neither mutates anything outside this call (Psalm 7 reads them as impure).
+        /** @psalm-suppress ImpureByReferenceAssignment, ImpureMethodCall */
         $index[$slug] = [
             'title' => Str::of($last)->replace('-', ' ')->title()->toString(),
             'document' => null,
@@ -165,8 +170,12 @@ final class DocumentTree
         $parentSegments = array_slice($segments, 0, -1);
 
         if ($parentSegments === []) {
+            // The by-reference arguments are local build-up arrays, never shared state.
+            /** @psalm-suppress ImpureByReferenceAssignment */
             $rootSlugs[] = $slug;
         } else {
+            // The by-reference arguments are local build-up arrays, never shared state.
+            /** @psalm-suppress ImpureByReferenceAssignment */
             $childSlugs[self::ensureSection($parentSegments, $index, $childSlugs, $rootSlugs)][] = $slug;
         }
 
@@ -182,6 +191,8 @@ final class DocumentTree
     {
         $basename = basename($document->relativePath);
 
+        // Psalm 7 treats Str helpers as impure; Str::beforeLast() is a pure string function.
+        /** @psalm-suppress ImpureMethodCall */
         return Str::beforeLast($basename, '.') === $indexName;
     }
 }
