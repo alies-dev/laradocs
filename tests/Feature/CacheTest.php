@@ -101,6 +101,7 @@ it('survives a cache store that forbids unserializing objects', function () {
     // and unserialize it itself.
     $store = new class extends ArrayStore
     {
+        #[Override]
         public function get($key): mixed
         {
             $value = parent::get($key);

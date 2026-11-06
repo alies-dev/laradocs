@@ -19,6 +19,7 @@ function symlinkAwareFilesystem(): void
         /**
          * @return array<int, SplFileInfo>
          */
+        #[Override]
         public function allFiles($directory, $hidden = false): array
         {
             return iterator_to_array(

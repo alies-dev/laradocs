@@ -21,6 +21,7 @@ abstract class TestCase extends Orchestra
      */
     protected array $tempDocs = [];
 
+    #[\Override]
     protected function tearDown(): void
     {
         $filesystem = new Filesystem;
@@ -35,6 +36,7 @@ abstract class TestCase extends Orchestra
     /**
      * @return array<int, class-string>
      */
+    #[\Override]
     protected function getPackageProviders($app): array
     {
         $providers = [
@@ -70,6 +72,7 @@ abstract class TestCase extends Orchestra
         return $providers;
     }
 
+    #[\Override]
     protected function defineEnvironment($app): void
     {
         $app['config']->set('app.key', 'base64:' . base64_encode(random_bytes(32)));

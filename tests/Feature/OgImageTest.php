@@ -20,6 +20,7 @@ function fakeOgGenerator(string $bytes = 'FAKE-PNG-BYTES'): OgImageGenerator
 
         public function __construct(public string $bytes) {}
 
+        #[Override]
         public function generate(OgImageData $data): string
         {
             $this->calls++;

@@ -238,6 +238,7 @@ it('builds a browser command containing the escaped url', function () {
     {
         public function __construct(public ?string &$captured) {}
 
+        #[Override]
         protected function exec(string $command): void
         {
             $this->captured = $command;
@@ -332,6 +333,7 @@ it('lets a subclass widen the scopes, in the authorize url and the refresh alike
 
     $flow = new class extends OAuthFlow
     {
+        #[Override]
         protected function scopes(): array
         {
             return [...parent::scopes(), 'sites:write', 'user:read'];
@@ -371,6 +373,7 @@ it('completes login end to end over a real loopback socket', function () {
         public function __construct(public int $port) {}
 
         // Stand in for the browser: connect to the loopback and deliver the code.
+        #[Override]
         protected function openBrowser(string $url): void
         {
             parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
@@ -407,6 +410,7 @@ it('throws when the token exchange fails during login', function () {
     {
         public function __construct(public int $port) {}
 
+        #[Override]
         protected function openBrowser(string $url): void
         {
             parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
@@ -424,6 +428,7 @@ it('rejects a mismatched state returned from authorization', function () {
 
     $flow = new class extends OAuthFlow
     {
+        #[Override]
         protected function awaitAuthorization(string $authorizeUrl): array
         {
             return ['code' => 'c', 'state' => 'tampered'];

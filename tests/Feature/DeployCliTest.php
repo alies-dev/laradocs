@@ -47,6 +47,7 @@ function fakeOAuth(callable $login): void
             $this->login = $login;
         }
 
+        #[Override]
         public function login(?callable $onPrompt = null): array
         {
             return ($this->login)($onPrompt);

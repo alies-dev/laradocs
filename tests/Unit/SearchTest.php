@@ -32,21 +32,25 @@ function stubEngine(string $name): SearchEngine
     {
         public function __construct(private string $label) {}
 
+        #[Override]
         public function search(string $query, array $index, int $limit): array
         {
             return [];
         }
 
+        #[Override]
         public function sync(array $index): void
         {
             // No-op: this stub only needs name() for engine-resolution tests.
         }
 
+        #[Override]
         public function flush(): void
         {
             // No-op: this stub only needs name() for engine-resolution tests.
         }
 
+        #[Override]
         public function name(): string
         {
             return $this->label;

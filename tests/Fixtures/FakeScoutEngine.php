@@ -26,6 +26,7 @@ class FakeScoutEngine extends Engine
     /**
      * @param  Collection<int, mixed>  $models
      */
+    #[\Override]
     public function update($models): void
     {
         foreach ($models as $model) {
@@ -44,11 +45,13 @@ class FakeScoutEngine extends Engine
     /**
      * @param  Collection<int, mixed>  $models
      */
+    #[\Override]
     public function delete($models): void
     {
         // No-op: tests flush and re-index wholesale, so per-model deletes are unused.
     }
 
+    #[\Override]
     public function search(Builder $builder): mixed
     {
         $query = mb_strtolower($builder->query);
@@ -66,42 +69,50 @@ class FakeScoutEngine extends Engine
         return ['hits' => $hits];
     }
 
+    #[\Override]
     public function paginate(Builder $builder, $perPage, $page): mixed
     {
         return $this->search($builder);
     }
 
+    #[\Override]
     public function mapIds($results): Collection
     {
         return collect($results['hits'])->pluck('slug');
     }
 
+    #[\Override]
     public function map(Builder $builder, $results, $model): Collection
     {
         return collect($results['hits']);
     }
 
+    #[\Override]
     public function lazyMap(Builder $builder, $results, $model): LazyCollection
     {
         return LazyCollection::make($results['hits']);
     }
 
+    #[\Override]
     public function getTotalCount($results): int
     {
         return count($results['hits']);
     }
 
+    #[\Override]
     public function flush($model): void
     {
         $this->documents = [];
         $this->flushed++;
     }
 
+    #[\Override]
     public function createIndex($name, array $options = []): void
     {
         // No-op: this in-memory engine needs no index provisioning.
     }
 
+    #[\Override]
     public function deleteIndex($name): void
     {
         // No-op: documents live in memory and are cleared via flush().

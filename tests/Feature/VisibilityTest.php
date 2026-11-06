@@ -19,6 +19,7 @@ function hidePrivate(): object
     {
         public int $calls = 0;
 
+        #[Override]
         public function filter(DocumentCollection $documents): DocumentCollection
         {
             $this->calls++;

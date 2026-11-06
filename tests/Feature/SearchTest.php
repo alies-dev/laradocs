@@ -223,11 +223,13 @@ it('laradocs:index returns a failure exit when one version sync fails', function
         {
             public function __construct(private int &$calls) {}
 
+            #[Override]
             public function search(string $query, array $index, int $limit): array
             {
                 return [];
             }
 
+            #[Override]
             public function sync(array $index): void
             {
                 if (++$this->calls === 1) {
@@ -235,8 +237,10 @@ it('laradocs:index returns a failure exit when one version sync fails', function
                 }
             }
 
+            #[Override]
             public function flush(): void {}
 
+            #[Override]
             public function name(): string
             {
                 return 'broken';
@@ -274,21 +278,25 @@ it('laradocs:clear reports a search index flush failure without failing', functi
 
     app()->bind(SearchEngine::class, fn (): SearchEngine => new class implements SearchEngine
     {
+        #[Override]
         public function search(string $query, array $index, int $limit): array
         {
             return [];
         }
 
+        #[Override]
         public function sync(array $index): void
         {
             // No-op: this stub only exercises the flush() failure path.
         }
 
+        #[Override]
         public function flush(): void
         {
             throw new RuntimeException('index unreachable');
         }
 
+        #[Override]
         public function name(): string
         {
             return 'broken';
@@ -364,21 +372,25 @@ it('laradocs:index surfaces engine failures as a non-zero exit', function () {
 
     app()->bind(SearchEngine::class, fn (): SearchEngine => new class implements SearchEngine
     {
+        #[Override]
         public function search(string $query, array $index, int $limit): array
         {
             return [];
         }
 
+        #[Override]
         public function sync(array $index): void
         {
             throw new RuntimeException('engine unreachable');
         }
 
+        #[Override]
         public function flush(): void
         {
             // No-op: this stub only exercises the sync() failure path.
         }
 
+        #[Override]
         public function name(): string
         {
             return 'broken';
@@ -406,6 +418,7 @@ function bindFakeMeilisearchScout(?Closure $onUpdate = null): MeilisearchClient
         /** @var array<int, array<string, mixed>> */
         public array $taskLog = [];
 
+        #[Override]
         public function getTasks(?TasksQuery $options = null): TasksResults
         {
             $query = $options?->toArray() ?? [];
@@ -420,6 +433,7 @@ function bindFakeMeilisearchScout(?Closure $onUpdate = null): MeilisearchClient
             return new TasksResults(['results' => $matching]);
         }
 
+        #[Override]
         public function waitForTask($uid, int $timeoutInMs = 5000, int $intervalInMs = 50): array
         {
             foreach ($this->taskLog as &$task) {
@@ -444,6 +458,7 @@ function bindFakeMeilisearchScout(?Closure $onUpdate = null): MeilisearchClient
             private ?Closure $onUpdate,
         ) {}
 
+        #[Override]
         public function update($models): void
         {
             parent::update($models);

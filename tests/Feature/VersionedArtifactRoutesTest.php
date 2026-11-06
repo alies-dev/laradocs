@@ -76,6 +76,7 @@ it('serves the api/search endpoint instead of redirecting, scoped to the default
 it('serves the og image index instead of redirecting', function () {
     $this->app->instance(OgImageGenerator::class, new class implements OgImageGenerator
     {
+        #[Override]
         public function generate(OgImageData $data): string
         {
             return 'FAKE-PNG-BYTES';

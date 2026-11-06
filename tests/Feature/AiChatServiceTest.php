@@ -221,6 +221,7 @@ it('answers only from the documents the reader may read', function (): void {
     // Asserted through the tool the assistant would actually call.
     $this->app->bind(DocumentVisibility::class, fn (): DocumentVisibility => new class implements DocumentVisibility
     {
+        #[Override]
         public function filter(DocumentCollection $documents): DocumentCollection
         {
             return $documents->reject(fn (Document $document): bool => $document->slug === 'install')->values();

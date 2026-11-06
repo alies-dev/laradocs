@@ -133,11 +133,13 @@ it('resolves filesystem documents before OpenApi documents on a slug collision',
     {
         public function __construct(private readonly Document $doc) {}
 
+        #[Override]
         public function all(): DocumentCollection
         {
             return new DocumentCollection([$this->doc]);
         }
 
+        #[Override]
         public function find(string $slug): ?Document
         {
             return $slug === $this->doc->slug ? $this->doc : null;

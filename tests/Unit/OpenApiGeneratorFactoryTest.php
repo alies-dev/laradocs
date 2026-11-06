@@ -24,6 +24,7 @@ final class FakeSpecGeneratorFactory extends SpecGeneratorFactory
         parent::__construct($router);
     }
 
+    #[Override]
     protected function scrambleAvailable(): bool
     {
         return $this->available;

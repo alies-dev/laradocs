@@ -86,6 +86,7 @@ it('fails with install instructions when the scramble driver is requested but ab
     // path is exercised even on hosts (like CI) where Scramble IS installed.
     $this->app->bind(SpecGeneratorFactory::class, fn (): SpecGeneratorFactory => new class(app('router')) extends SpecGeneratorFactory
     {
+        #[Override]
         protected function scrambleAvailable(): bool
         {
             return false;
